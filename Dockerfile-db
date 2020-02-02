@@ -1,0 +1,8 @@
+FROM ubuntu:18.04
+RUN apt-get update && apt-get install -y curl bsdtar openjdk-8-jre
+WORKDIR /var/lib/datomic
+# Download, and use bsdtar to extract into our required folder structure
+RUN curl -SL https://my.datomic.com/downloads/free/0.9.5344 -o datomic.zip && bsdtar --strip-components=1 -xvf datomic.zip && rm datomic.zip
+COPY config/transactor.properties .
+ENV DB_URI="datomic:free://db:4334/character-sheet"
+CMD bin/transactor -Xms400m -Xmx400m /var/lib/datomic/transactor.properties

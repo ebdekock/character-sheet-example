@@ -1,0 +1,32 @@
+---
+    version: "3.7"
+    services:
+      db:
+        build:
+          context: .
+          dockerfile: Dockerfile-db
+        ports:
+        - "4334-4336:4334-4336"
+        # This is open if you want to start up a db REST server
+        # /var/lib/datomic/bin/rest -p 8888 dev datomic:free://localhost:4334/
+        - "8888:8888"
+        volumes:
+        - ./datomic_data:/var/lib/datomic/data
+      app:
+        build:
+          context: .
+          dockerfile: Dockerfile-app
+        environment:
+            DB_URI: "datomic:free://db:4334/character-sheet"
+        ports:
+          - "3000:3000"
+        depends_on:
+          - "db"
+      web:
+        build:
+          context: .
+          dockerfile: Dockerfile-web
+        ports:
+          - "80:80"
+        depends_on:
+          - "app"
